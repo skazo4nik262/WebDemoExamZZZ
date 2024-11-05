@@ -17,5 +17,7 @@ public partial class User
 
     public DateOnly? LastVisit { get; set; }
 
+    public bool IsBlocked { get; set; }
+
     public virtual Role Role { get; set; } = null!;
 }

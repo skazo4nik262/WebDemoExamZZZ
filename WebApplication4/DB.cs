@@ -34,7 +34,7 @@ namespace WebApplication4
             var localUser = await context.Users.FirstOrDefaultAsync(s => s.Id == user.Id);
             if (user != null)
             {
-                context.Entry(localUser).CurrentValues.SetValues(user);
+                context.Users.Entry(localUser).CurrentValues.SetValues(user);
                 await context.SaveChangesAsync();
             }
             else return;
@@ -43,9 +43,10 @@ namespace WebApplication4
         public async Task DeleteUser(User user)
         {
             var localUser = await context.Users.FirstOrDefaultAsync(s => s.Id == user.Id);
+            localUser.IsBlocked = true;
             if (user != null)
             {
-                context.Users.Remove(localUser);
+                context.Users.Entry(localUser).CurrentValues.SetValues(user);
                 await context.SaveChangesAsync();
             }
             else return;

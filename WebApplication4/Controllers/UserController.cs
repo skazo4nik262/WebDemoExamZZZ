@@ -22,7 +22,7 @@ namespace WebApplication4.Controllers
             await DB.Instance.EditUser(user);
         }
 
-        [HttpPost("DeleteUser")]
+        [HttpPost("BlockUser")]
         public async Task DeleteUser(User user)
         {
             await DB.Instance.DeleteUser(user);
@@ -53,7 +53,9 @@ namespace WebApplication4.Controllers
             var user = await context.Users.FirstOrDefaultAsync(s => s.Login == login && s.Password == password);
 
             if (DateTime.Now.Month - user.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year)
-                return true;
+            {
+                user.IsBlocked = true; return true;
+            }
             else return false;
         }
 
