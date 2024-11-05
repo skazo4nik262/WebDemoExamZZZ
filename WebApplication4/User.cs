@@ -13,7 +13,9 @@ public partial class User
 
     public int RoleId { get; set; }
 
-    public bool FirstSign { get; set; } = false;
+    public bool FirstSign { get; set; }
+
+    public DateOnly? LastVisit { get; set; }
 
     public virtual Role Role { get; set; } = null!;
 }
