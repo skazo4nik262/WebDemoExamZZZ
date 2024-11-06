@@ -11,9 +11,9 @@ namespace WebApplication4.Controllers
         User06Context context = new User06Context();
         //--------------------------------------------------\\
         [HttpPost("AddUser")]
-        public async Task AddUser(User user)
+        public async Task AddUser(UserModel user)
         {
-            await DB.Instance.Adduser(user);
+            await DB.Instance.Adduser((User)user);
         }
 
         [HttpPost("EditUser")]
@@ -41,7 +41,7 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost("CheckUserInDB")]
-        public async Task<bool> CheckUserInDB(User user)
+        public async Task<bool> CheckUserInDB(UserModel user)
         {
             if (!string.IsNullOrWhiteSpace(user.Login) || !string.IsNullOrWhiteSpace(user.Password))
             {
