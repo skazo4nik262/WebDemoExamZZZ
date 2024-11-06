@@ -41,36 +41,43 @@ namespace WebApplication4.Controllers
         }
 
         [HttpPost("CheckUserInDB")]
-        public async Task<bool> CheckUserInDB(string login, string password)
+        public async Task<bool> CheckUserInDB(User user)
         {
-            var user = await context.Users.FirstOrDefaultAsync(s => s.Login == login && s.Password == password);
-            if (user != null) return true; else return false;
-        }
-
-        [HttpPost("CheckUserIsBlocked")]
-        public async Task<bool> CheckUserIsBlocked(string login, string password)
-        {
-            var user = await context.Users.FirstOrDefaultAsync(s => s.Login == login && s.Password == password);
-
-            if (DateTime.Now.Month - user.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year)
+            if (!string.IsNullOrWhiteSpace(user.Login) || !string.IsNullOrWhiteSpace(user.Password))
             {
-                user.IsBlocked = true; return true;
+                var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+                if (localuser != null) return true; else return false;
             }
             else return false;
         }
 
-        [HttpPost("CheckUserRole")]
-        public async Task<bool> CheckUserRole(string login, string password)
+
+        [HttpPost("CheckUserIsBlocked")]
+        public async Task<bool> CheckUserIsBlocked(User user)
         {
-            var user = await context.Users.FirstOrDefaultAsync(s => s.Login == login && s.Password == password);
-            if (user.RoleId == 2) return true; else return false;
+            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+
+            if (DateTime.Now.Month - localuser.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year || user.ErrorCount>= 3)
+            {
+                localuser.IsBlocked = true; await context.SaveChangesAsync(); return false;
+            }
+            else return true;
+        }
+
+
+
+        [HttpPost("CheckUserRole")]
+        public async Task<bool> CheckUserRole(User user)
+        {
+            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+            if (localuser.RoleId == 2) return true; else return false;
         }
 
         [HttpPost("CheckFirstSign")]
-        public async Task<bool> CheckFirstSign(string login, string password)
+        public async Task<bool> CheckFirstSign(User user)
         {
-            var user = await context.Users.FirstOrDefaultAsync(s => s.Login == login && s.Password == password);
-            if (user.FirstSign) return true; else return false;
+            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+            if (localuser.FirstSign) return true; else return false;
         }
         //--------------------------------------------------\\
     }

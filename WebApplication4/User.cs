@@ -19,5 +19,7 @@ public partial class User
 
     public bool IsBlocked { get; set; }
 
+    public int? ErrorCount { get; set; }
+
     public virtual Role Role { get; set; } = null!;
 }

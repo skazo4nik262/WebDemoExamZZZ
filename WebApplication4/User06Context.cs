@@ -158,6 +158,9 @@ public partial class User06Context : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.ErrorCount)
+                .HasDefaultValueSql("'0'")
+                .HasColumnType("int(1)");
             entity.Property(e => e.Login)
                 .HasMaxLength(255)
                 .HasDefaultValueSql("''");
