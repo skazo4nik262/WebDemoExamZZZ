@@ -8,7 +8,7 @@ namespace WebApplication4.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        User06Context context ;
+        User06Context context;
 
         public UserController(User06Context context)
         {
@@ -61,12 +61,13 @@ namespace WebApplication4.Controllers
         public async Task<bool> CheckUserIsBlocked(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
-
-            if (DateTime.Now.Month - localuser.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year || user.ErrorCount>= 3)
-            {
-                localuser.IsBlocked = true; await context.SaveChangesAsync(); return false;
-            }
-            else return true;
+            if (localuser != null)
+                if (DateTime.Now.Month - localuser.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year || user.ErrorCount >= 3)
+                {
+                    localuser.IsBlocked = true; await context.SaveChangesAsync(); return false;
+                }
+                else return true;
+            return true;
         }
 
 
@@ -75,14 +76,17 @@ namespace WebApplication4.Controllers
         public async Task<bool> CheckUserRole(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
-            if (localuser.RoleId == 2) return true; else return false;
+            if (localuser != null)
+                if (localuser.RoleId == 2)
+                    return true;
+            return false;
         }
 
         [HttpPost("CheckFirstSign")]
         public async Task<bool> CheckFirstSign(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
-            if (localuser.FirstSign) return true; else return false;
+            if (localuser.FirstSign) { localuser.FirstSign = false; await context.SaveChangesAsync(); return true; } else return false;
         }
         //--------------------------------------------------\\
     }
