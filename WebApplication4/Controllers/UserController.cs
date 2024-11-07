@@ -8,7 +8,12 @@ namespace WebApplication4.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        User06Context context = new User06Context();
+        User06Context context ;
+
+        public UserController(User06Context context)
+        {
+            this.context = context;
+        }
         //--------------------------------------------------\\
         [HttpPost("AddUser")]
         public async Task AddUser(UserModel user)
@@ -53,7 +58,7 @@ namespace WebApplication4.Controllers
 
 
         [HttpPost("CheckUserIsBlocked")]
-        public async Task<bool> CheckUserIsBlocked(User user)
+        public async Task<bool> CheckUserIsBlocked(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
 
@@ -67,14 +72,14 @@ namespace WebApplication4.Controllers
 
 
         [HttpPost("CheckUserRole")]
-        public async Task<bool> CheckUserRole(User user)
+        public async Task<bool> CheckUserRole(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
             if (localuser.RoleId == 2) return true; else return false;
         }
 
         [HttpPost("CheckFirstSign")]
-        public async Task<bool> CheckFirstSign(User user)
+        public async Task<bool> CheckFirstSign(UserModel user)
         {
             var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
             if (localuser.FirstSign) return true; else return false;
