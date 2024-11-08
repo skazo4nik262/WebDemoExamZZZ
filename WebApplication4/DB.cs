@@ -13,10 +13,7 @@ namespace WebApplication4
 
         public DB()
         {
-            context.Roles.Add(new Role() { RoleName = "Пользователь", });
-            context.Roles.Add(new Role() { RoleName = "Администратор", });
-            context.Users.Add(new User() { Login = "123", Password = "123", RoleId = 1});
-            context.Users.Add(new User() { Login = "321", Password = "321", RoleId = 2});
+            
         }
         //--------------------------------------------------\\
         public async Task Adduser(User user)

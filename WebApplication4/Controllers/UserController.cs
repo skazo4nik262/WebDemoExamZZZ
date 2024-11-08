@@ -18,13 +18,48 @@ namespace WebApplication4.Controllers
         [HttpPost("AddUser")]
         public async Task AddUser(UserModel user)
         {
-            await DB.Instance.Adduser((User)user);
+            if (user != null)
+            {
+                if (await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.RoleId == user.RoleId) == null)
+                {
+                    await context.Users.AddAsync(user);
+                    await context.SaveChangesAsync();
+                }
+            }
+            else return;
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<string> ChangePassword(ChangePasswordModel ChangePasswordModel)
+        {
+            var localUser = await context.Users.FirstOrDefaultAsync(s => s.Password == ChangePasswordModel.CurrentPassword);
+            if (localUser != null)
+            {
+                if (ChangePasswordModel.NewPassword == ChangePasswordModel.NewNewPassword)
+                {
+                    context.Users.Entry(localUser).CurrentValues.SetValues(ChangePasswordModel.NewPassword);
+                    return "Пароль успешно изменён";
+                }
+                else return "Новые пароли различаются";
+            }
+            else return "Текущий пароль введен неверно";
         }
 
         [HttpPost("EditUser")]
         public async Task EditUser(User user)
         {
-            await DB.Instance.EditUser(user);
+            var localUser = await context.Users.FirstOrDefaultAsync(s => s.Id == user.Id);
+            if (localUser != null)
+            {
+                if (user.IsBlocked == false)
+                {
+                    localUser.IsBlocked = false;
+                    localUser.ErrorCount = 0;
+                }
+                context.Users.Entry(localUser).CurrentValues.SetValues(user);
+                await context.SaveChangesAsync();
+            }
+            else return;
         }
 
         [HttpPost("BlockUser")]
@@ -60,17 +95,38 @@ namespace WebApplication4.Controllers
         [HttpPost("CheckUserIsBlocked")]
         public async Task<bool> CheckUserIsBlocked(UserModel user)
         {
-            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login);
             if (localuser != null)
-                if (DateTime.Now.Month - localuser.LastVisit.Value.Month > 1 && DateTime.Now.Year == user.LastVisit.Value.Year || user.ErrorCount >= 3)
+            {
+                if (DateTime.Now.Month - localuser.LastVisit.Value.Month >= 1 && DateTime.Now.Year == user.LastVisit.Value.Year || user.ErrorCount >= 3 || localuser.IsBlocked == true)
                 {
                     localuser.IsBlocked = true; await context.SaveChangesAsync(); return false;
                 }
+                else if (localuser.Password != user.Password)
+                {
+                    localuser.ErrorCount++;
+                    if (localuser.ErrorCount >= 3)
+                    {
+                        //если че добавить localuser.ErrorCount = 0;
+                        localuser.IsBlocked = true;
+                        await context.SaveChangesAsync();
+                        return false;
+                    }
+                    await context.SaveChangesAsync(); return true;
+                }
                 else return true;
+            }
             return true;
         }
 
-
+        [HttpPost("LastVisitChange")]
+        public async Task LastVisitChange(UserModel user)
+        {
+            var localuser = await context.Users.FirstOrDefaultAsync(s => s.Login == user.Login && s.Password == user.Password);
+            if (localuser != null)
+                localuser.LastVisit = user.LastVisit;
+            await context.SaveChangesAsync();
+        }
 
         [HttpPost("CheckUserRole")]
         public async Task<bool> CheckUserRole(UserModel user)

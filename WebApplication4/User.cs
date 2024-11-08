@@ -45,12 +45,12 @@ public partial class UserModel
 
     public RoleModel Role { get; set; }
 
-    public static explicit operator User (UserModel from)
+    public static implicit operator User (UserModel from)
     {
         return new User { Id = from.Id, ErrorCount = from.ErrorCount, Login = from.Login, Password = from.Password, RoleId = from.RoleId, FirstSign = from.FirstSign, LastVisit = from.LastVisit, IsBlocked = from.IsBlocked};
     }
 
-    public static explicit operator UserModel(User from)
+    public static implicit operator UserModel(User from)
     {
         return new UserModel { Id = from.Id, ErrorCount = from.ErrorCount, Login = from.Login, Password = from.Password, RoleId = from.RoleId, FirstSign = from.FirstSign, LastVisit = from.LastVisit, IsBlocked = from.IsBlocked, Role = (RoleModel)from.Role };
     }
